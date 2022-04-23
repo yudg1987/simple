@@ -8,7 +8,7 @@
         <version>2.2.7.RELEASE</version>
         <relativePath/>
     </parent>
-    <groupId>com.dgyu.springboot</groupId>
+    <groupId>com.dgyu.pure_design</groupId>
     <artifactId>pure_design</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>pureDesign</name>
