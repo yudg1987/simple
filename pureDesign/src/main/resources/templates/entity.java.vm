@@ -1,0 +1,86 @@
+package ${package.Entity};
+
+#foreach($pkg in ${table.importPackages})
+import ${pkg};
+#end
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+#if(${entityLombokModel})
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.fasterxml.jackson.annotation.JsonFormat;
+#end
+
+/**
+ * @Description:$!{table.comment}
+ * @author ${author}
+ * @since ${date}
+ */
+@ApiModel(value = "$!{table.comment}")
+#if(${entityLombokModel})
+@Data
+@Accessors(chain = true)
+#end
+#if(${table.convert})
+@TableName("${table.name}")
+#end
+#if(${superEntityClass})
+public class ${entity} extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
+#elseif(${activeRecord})
+public class ${entity} extends Model<${entity}> {
+#else
+public class ${entity} implements Serializable{
+#end
+
+    private static final long serialVersionUID=1L;
+
+## ----------  BEGIN 字段循环遍历  ----------
+    #foreach($field in ${table.fields})
+    #if(${field.keyFlag})
+    #set($keyPropertyName=${field.propertyName})
+    #end
+    @ApiModelProperty(value = "${field.comment}")
+    #if(${field.keyFlag})
+    ## 主键s
+    #if(${field.keyIdentityFlag})
+@TableId(value = "${field.name}", type = IdType.AUTO)
+    #elseif(!$null.isNull(${idType}) && "$!idType" != "")
+@TableId(value = "${field.name}", type = IdType.${idType})
+    #elseif(${field.convert})
+@TableId("${field.name}")
+    #end
+    ## 普通字段
+    #elseif(${field.fill})
+    ## -----   存在字段填充设置   -----
+    #if(${field.convert})
+    @TableField(value = "${field.name}", fill = FieldFill.${field.fill})
+    #else
+    @TableField(fill = FieldFill.${field.fill})
+    #end
+    #elseif(${field.name}=="create_time")
+    @TableField(value = "${field.name}", fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    #elseif(${field.name}=="update_time")
+    @TableField(value = "${field.name}", fill = FieldFill.INSERT_UPDATE)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    #elseif(${field.convert})
+    @TableField("${field.name}")
+    #end
+## 乐观锁注解
+    #if(${versionFieldName}==${field.name})
+    @Version
+    #end
+## 逻辑删除注解
+    #if(${logicDeleteFieldName}==${field.name})
+    @TableLogic
+    #end
+    private ${field.propertyType} ${field.propertyName};
+    #end
+## ----------  END 字段循环遍历  ----------
+
+
+
+
+}
