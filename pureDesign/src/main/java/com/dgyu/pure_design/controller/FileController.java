@@ -4,12 +4,19 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import io.swagger.annotations.ApiOperation;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dgyu.pure_design.common.Result;
+import com.dgyu.pure_design.common.exception.BusinessException;
 import com.dgyu.pure_design.entity.Files;
 import com.dgyu.pure_design.mapper.FileMapper;
+import com.github.tobato.fastdfs.domain.fdfs.StorePath;
+import com.github.tobato.fastdfs.service.FastFileStorageClient;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 /*import org.springframework.data.redis.core.StringRedisTemplate;
 */import org.springframework.web.bind.annotation.*;
@@ -18,10 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
+import com.github.tobato.fastdfs.domain.proto.storage.DownloadCallback;
 
 /**
  * 文件上传相关接口
@@ -38,6 +48,12 @@ public class FileController {
 
     @Resource
     private FileMapper fileMapper;
+    
+    @Autowired
+    private FastFileStorageClient storageClient;
+    
+    @Value("${fdfs.path}")
+    private String fdfsPath;
 
 	/*
 	 * @Autowired private StringRedisTemplate stringRedisTemplate;
@@ -59,14 +75,14 @@ public class FileController {
         // 定义一个文件唯一的标识码
         String fileUUID = IdUtil.fastSimpleUUID() + StrUtil.DOT + type;
 
-        File uploadFile = new File(fileUploadPath + fileUUID);
+        //File uploadFile = new File(fileUploadPath + fileUUID);
         // 判断配置的文件目录是否存在，若不存在则创建一个新的文件目录
-        File parentFile = uploadFile.getParentFile();
-        if(!parentFile.exists()) {
-            parentFile.mkdirs();
-        }
+        //File parentFile = uploadFile.getParentFile();
+        //if(!parentFile.exists()) {
+        //    parentFile.mkdirs();
+        //}
 
-        String url;
+        String url=null;
         // 获取文件的md5
         String md5 = SecureUtil.md5(file.getInputStream());
         // 从数据库查询是否存在相同的记录
@@ -75,9 +91,15 @@ public class FileController {
             url = dbFiles.getUrl();
         } else {
             // 上传文件到磁盘
-            file.transferTo(uploadFile);
+            //file.transferTo(uploadFile);
             // 数据库若不存在重复文件，则不删除刚才上传的文件
-            url = "http://" + serverIp + ":9091/file/" + fileUUID;
+            //url = "http://" + serverIp + ":9091/file/" + fileUUID;
+            
+            String fileExtName = StringUtils.substringAfterLast(file.getOriginalFilename(), ".");
+            StorePath storePath=storageClient.uploadFile(file.getInputStream(), size, fileExtName, null);
+            if(null != storePath) {
+            	url=storePath.getFullPath();
+            }
         }
 
 
@@ -115,17 +137,35 @@ public class FileController {
      * @param response
      * @throws IOException
      */
-    @GetMapping("/{fileUUID}")
+    @ApiOperation(value = "下载文件", notes = "下载文件")
+	@RequestMapping(value = "/{fileUUID}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public void download(@PathVariable String fileUUID, HttpServletResponse response) throws IOException {
         // 根据文件的唯一标识码获取文件
-        File uploadFile = new File(fileUploadPath + fileUUID);
+        //File uploadFile = new File(fileUploadPath + fileUUID);
+    	Files file=this.fileMapper.selectById(fileUUID);
+    	if(null == file) {
+    		throw new BusinessException("文件不存在"+fileUUID);
+    	}
+    	InputStream ins = storageClient.downloadFile(null, file.getUrl(), new DownloadCallback<InputStream>() {
+            @Override
+            public InputStream recv(InputStream ins) throws IOException {
+                // 将此ins返回给上面的ins
+                return ins;
+            }
+        });
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] buff = new byte[100];
+        int rc = 0;
+        while ((rc = ins.read(buff, 0, 100)) > 0) {
+            byteArrayOutputStream.write(buff, 0, rc);
+        }
         // 设置输出流的格式
         ServletOutputStream os = response.getOutputStream();
         response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileUUID, "UTF-8"));
         response.setContentType("application/octet-stream");
 
         // 读取文件的字节流
-        os.write(FileUtil.readBytes(uploadFile));
+        os.write(byteArrayOutputStream.toByteArray());
         os.flush();
         os.close();
     }
@@ -200,7 +240,11 @@ public class FileController {
         if (!"".equals(name)) {
             queryWrapper.like("name", name);
         }
-        return Result.success(fileMapper.selectPage(new Page<>(pageNum, pageSize), queryWrapper));
+        Page<Files>  page=fileMapper.selectPage(new Page<>(pageNum, pageSize), queryWrapper);
+        page.getRecords().forEach(file->{
+        	file.setUrl(fdfsPath+file.getUrl());
+        });
+        return Result.success(page);
     }
 
 

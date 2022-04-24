@@ -37,7 +37,7 @@
       </el-table-column>
       <el-table-column label="下载">
         <template slot-scope="scope">
-          <el-button type="primary" @click="download(scope.row.url)">下载</el-button>
+          <el-button type="primary" @click="download(scope.row)">下载</el-button>
         </template>
       </el-table-column>
       <el-table-column label="启用">
@@ -163,11 +163,32 @@ export default {
       this.$message.success("上传成功")
       this.load()
     },
-    download(url) {
-      window.open(url)
+    download(row) {
+       /*this.request.get(serverIp+'/file/download'+row.id).then(res => {
+         // this.$ry.download(res.msg)
+         if (!res) {
+           return;
+         }
+         let blob = new Blob([res], {
+           type: "application/octet-stream",
+         });
+         let url = window.URL.createObjectURL(blob);
+         let link = document.createElement("a");
+         link.style.display = "none";
+         link.href = url;
+         link.download = row.name;
+         document.body.appendChild(link);
+         link.click();
+         document.body.removeChild(link)
+      })*/
+      window.open(
+          serverIp+'/file/download'+row.id,
+          '_self'
+      );
     },
     preview(url) {
-      window.open('https://file.keking.cn/onlinePreview?url=' + encodeURIComponent(window.btoa((url))))
+      window.open(url)
+      //window.open('https://file.keking.cn/onlinePreview?url=' + encodeURIComponent(window.btoa((url))))
     },
   }
 }
