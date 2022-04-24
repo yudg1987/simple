@@ -191,7 +191,8 @@ export default {
       this.load()
     },
     exp() {
-      window.open(`http://${serverIp}:9090/role/export`)
+      // window.open(`http://${serverIp}:9090/role/export`)
+      window.open(serverIp+`/role/export`)
     },
     handleExcelImportSuccess() {
       this.$message.success("导入成功")

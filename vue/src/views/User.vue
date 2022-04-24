@@ -236,7 +236,8 @@ export default {
       this.load()
     },
     exp() {
-      window.open(`http://${serverIp}:9090/user/export`)
+      /*window.open(`http://${serverIp}:9090/user/export`)*/
+      window.open(serverIp+`/user/export`)
     },
     handleExcelImportSuccess() {
       this.$message.success("导入成功")
