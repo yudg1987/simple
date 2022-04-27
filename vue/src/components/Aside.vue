@@ -13,8 +13,8 @@
     </div>
     <div v-for="item in menus" :key="item.id">
       <div v-if="item.path">
-        <el-menu-item :index="item.path">
-          <i :class="item.icon"></i>
+        <el-menu-item :index="item.path" :class="$route.path === item.path ? 'is-active' : '' ">
+          <i :class="item.icon" ></i>
           <span slot="title">{{ item.name }}</span>
         </el-menu-item>
       </div>
@@ -25,7 +25,7 @@
             <span slot="title">{{ item.name }}</span>
           </template>
           <div  v-for="subItem in item.children" :key="subItem.id">
-            <el-menu-item :index="subItem.path">
+            <el-menu-item :index="subItem.path" :class="$route.path === subItem.path ? 'is-active' : '' ">
               <i :class="subItem.icon"></i>
               <span slot="title">{{ subItem.name }}</span>
             </el-menu-item>
@@ -49,20 +49,13 @@ export default {
       opens: localStorage.getItem("menus") ? JSON.parse(localStorage.getItem("menus")).map(v => v.id + '') : []
     }
   },
+  created(){
+    console.log(this.$route.path)
+  }
 }
 </script>
 
 <style>
-.el-menu-item.is-active {
-  background-color: rgb(38, 52, 69) !important;
-}
-.el-menu-item:hover {
-  background-color: rgb(38, 52, 69) !important;
-}
-
-.el-submenu__title:hover {
-  background-color: rgb(38, 52, 69) !important;
-}
 /*解决收缩菜单文字不消失问题*/
 .el-menu--collapse span {
   visibility: hidden;
