@@ -12,12 +12,12 @@
       <b style="color: white; margin-left: 5px" v-show="logoTextShow">后台管理系统</b>
     </div>
     <div v-for="item in menus" :key="item.id">
-      <div v-if="item.path" >
+      <div v-if="item.path">
         <el-menu-item :index="item.path"
-                      :class="{'show-active' :  $route.path === item.path}"
+                      :class="{'is-active' :  $route.path === item.path}"
                       :key="item.path">
-          <i :class="item.icon" ></i>
-          <span slot="title">{{ item.name }}  {{$route.path}}  </span>
+          <i :class="item.icon"></i>
+          <span slot="title">{{ item.name }}</span>
         </el-menu-item>
       </div>
       <div v-else>
@@ -26,10 +26,11 @@
             <i :class="item.icon"></i>
             <span slot="title">{{ item.name }}</span>
           </template>
-          <div  v-for="subItem in item.children" :key="subItem.id">
-            <el-menu-item :index="subItem.path" :class="{'show-active' :  $route.path === subItem.path}" :key="subItem.path">
+          <div v-for="subItem in item.children" :key="subItem.id">
+            <el-menu-item :index="subItem.path" :class="{'is-active' :  $route.path === subItem.path}"
+                          :key="subItem.path">
               <i :class="subItem.icon"></i>
-              <span slot="title" >{{ subItem.name }}</span>
+              <span slot="title">{{ subItem.name }}</span>
             </el-menu-item>
           </div>
         </el-submenu>
@@ -51,23 +52,25 @@ export default {
       opens: localStorage.getItem("menus") ? JSON.parse(localStorage.getItem("menus")).map(v => v.id + '') : []
     }
   },
-  created(){
+  created() {
     console.log(this.$route.path)
   }
 }
 </script>
 
-<style>
+<style scoped>
 /*解决收缩菜单文字不消失问题*/
 .el-menu--collapse span {
   visibility: hidden;
 }
+
 /*.show-active{
   padding-left: 20px;
   color: rgb(255, 208, 75);
   background-color: rgb(48, 65, 86);
 }*/
-.show-active{
-  color: rgb(255, 208, 75)!important;
+.is-active {
+  color: rgb(255, 208, 75) !important;
+  background-color: rgb(48, 65, 86) !important;
 }
 </style>
