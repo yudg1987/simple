@@ -11,7 +11,7 @@
           <el-input size="medium" style="margin: 10px 0" prefix-icon="el-icon-lock" show-password
                     v-model="user.password"></el-input>
         </el-form-item>
-        <el-form-item style="margin: 10px 0; text-align: right">
+        <el-form-item style="margin: 10px 0; text-align: center">
           <el-button type="warning" size="small" autocomplete="off" @click="$router.push('/register')">注册</el-button>
           <el-button type="primary" size="small" autocomplete="off" @click="login">登录</el-button>
         </el-form-item>
@@ -58,7 +58,8 @@ export default {
                 this.$router.push("/")
               }
             } else {
-              this.$message.error(res.msg)
+              console.log(res)
+              this.$message.error(res.message)
             }
           })
         }
