@@ -1,162 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-    <!--
-       说明：
-       1、日志级别及文件
-           日志记录采用分级记录，级别与日志文件名相对应，不同级别的日志信息记录到不同的日志文件中
-           例如：error级别记录到log-xxx-error.log或log-error.log（该文件为当前记录的日志文件），而log-xxx-error.log为归档日志，
-           日志文件按日期记录，同一天内，若日志文件大小等于或大于100M，则按0、1、2...顺序分别命名
-           例如log-2013-12-21-level.0.log
-           其它级别的日志也是如此。
-       2、文件路径
-           若开发、测试用，在Eclipse中运行项目，则到Eclipse的安装路径查找logs文件夹，以相对路径../logs。
-           若部署到Tomcat下，则在Tomcat下的logs文件中
-       3、Appender
-           FILEERROR对应error级别，文件名以log-xxx-error.log形式命名
-           FILEWARN对应warn级别，文件名以log-xxx-warn.log形式命名
-           FILEINFO对应info级别，文件名以log-xxx-info.log形式命名
-           FILEDEBUG对应debug级别，文件名以log-xxx-debug.log形式命名
-           stdout将日志信息输出到控制上，为方便开发测试使用
-    -->
-    <contextName>hsren</contextName>
+<configuration debug="false">
+    <!-- 日志输出格式 -->
+    <property name="LOG_PATTERN_CONSOLE"  value="%red(%d{yyyy-MM-dd HH:mm:ss.SSS}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{80}:%L) - %cyan(%msg%n)" />
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{80}:%L - %msg%n"/>
 
-    <!-- 日志目录 -->
-    <property name="LOG_PATH" value="./../logs"/>
-
-    <!-- 彩色日志依赖的渲染类 -->
-    <conversionRule conversionWord="clr"
-                    converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
-    <conversionRule conversionWord="wex"
-                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
-    <conversionRule conversionWord="wEx"
-                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
-
-    <!-- CONSOLE输出彩色日志格式 -->
-    <property name="CONSOLE_LOG_PATTERN"
-              value="${CONSOLE_LOG_PATTERN:-%clr(%d{yy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(){faint} %clr([%15.15t]){blue} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}" />
-
-    <!-- 文件输出格式 -->
-    <property name="FILE_LOG_PATTERN"
-              value="${FILE_LOG_PATTERN:-%d{yy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } [%t] %-40.40logger{39} : [%X{service_ip} %X{req.remoteHost} %X{req.method} %X{req.requestURL}] %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
-
-    <!-- 日志记录器，日期滚动记录 -->
-    <appender name="FILEERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 正在记录的日志文件的路径及文件名，如果设置此属性，滚动策略不生效 -->
-        <!--<file>${LOG_PATH}/log-error.log</file>-->
-        <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- 归档的日志文件的路径，例如今天是2013-12-21日志，当前写的日志文件路径为file节点指定，
-            可以将此文件与file指定文件路径设置为不同路径，从而将当前日志文件或归档日志文件置不同的目录。
-            而2013-12-21的日志文件在由fileNamePattern指定。%d{yyyy-MM-dd}指定日期格式，%i指定索引 -->
-            <fileNamePattern>${LOG_PATH}/error/pure-design-%d{yyyy-MM-dd}-error.%i.log</fileNamePattern>
-            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
-            <!--每个日志文件最大100MB-->
-            <maxFileSize>100MB</maxFileSize>
-            <!-- 日志最大的历史 30天 -->
-            <maxHistory>30</maxHistory>
-            <!--用来指定日志文件的上限大小，那么到了这个值，就会删除旧的日志-->
-            <totalSizeCap>2GB</totalSizeCap>
-        </rollingPolicy>
-        <!-- 追加方式记录日志 -->
-        <append>true</append>
-        <!-- 日志文件的格式 -->
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-            <charset>utf-8</charset>
-        </encoder>
-        <!-- 此日志文件只记录info级别的 -->
+    <!-- 控制台输出日志 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- 日志级别为INFO及以上 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <!-- 设置过滤级别 -->
-            <level>error</level>
-            <!-- 用于配置符合过滤条件的操作 -->
+            <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
-            <!-- 用于配置不符合过滤条件的操作 -->
-            <onMismatch>DENY</onMismatch>
-        </filter>
-    </appender>
-
-    <!-- 日志记录器，日期滚动记录 -->
-    <appender name="FILEWARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 正在记录的日志文件的路径及文件名，如果设置此属性，滚动策略不生效 -->
-        <!--<file>${LOG_PATH}/log-warn.log</file>-->
-        <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- 归档的日志文件的路径，例如今天是2013-12-21日志，当前写的日志文件路径为file节点指定，
-            可以将此文件与file指定文件路径设置为不同路径，从而将当前日志文件或归档日志文件置不同的目录。
-            而2013-12-21的日志文件在由fileNamePattern指定。%d{yyyy-MM-dd}指定日期格式，%i指定索引 -->
-            <fileNamePattern>${LOG_PATH}/warn/pure_design-%d{yyyy-MM-dd}-warn.%i.log</fileNamePattern>
-            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
-            <maxFileSize>100MB</maxFileSize>
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>2GB</totalSizeCap>
-        </rollingPolicy>
-        <!-- 追加方式记录日志 -->
-        <append>true</append>
-        <!-- 日志文件的格式 -->
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-            <charset>utf-8</charset>
-        </encoder>
-        <!-- 此日志文件只记录info级别的 -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>warn</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-    </appender>
-
-    <!-- 日志记录器，日期滚动记录 -->
-    <appender name="FILEINFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 正在记录的日志文件的路径及文件名，如果设置此属性，滚动策略不生效 -->
-        <!--<file>${LOG_PATH}/log-info.log</file>-->
-        <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- 归档的日志文件的路径，例如今天是2013-12-21日志，当前写的日志文件路径为file节点指定，可以将此文件与file指定文件路径设置为不同路径，从而将当前日志文件或归档日志文件置不同的目录。
-            而2013-12-21的日志文件在由fileNamePattern指定。%d{yyyy-MM-dd}指定日期格式，%i指定索引 -->
-            <fileNamePattern>${LOG_PATH}/info/pure_design-%d{yyyy-MM-dd}-info.%i.log</fileNamePattern>
-            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
-            <maxFileSize>100MB</maxFileSize>
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>2GB</totalSizeCap>
-        </rollingPolicy>
-        <!-- 追加方式记录日志 -->
-        <append>true</append>
-        <!-- 日志文件的格式 -->
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-            <charset>utf-8</charset>
-        </encoder>
-        <!-- 此日志文件只记录info级别的 -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>info</level>
-            <onMatch>ACCEPT</onMatch>
-            <!-- 设置为全记录 -->
-            <!--<onMismatch>DENY</onMismatch>-->
             <onMismatch>ACCEPT</onMismatch>
         </filter>
-    </appender>
-
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <!--encoder 默认配置为PatternLayoutEncoder-->
-        <encoder>
-            <!--<pattern>${CONSOLE_LOG_PATTERN}</pattern>-->
-            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-            <charset>utf8</charset>
+        <encoder charset="UTF-8">
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
-        <!--此日志appender是为开发使用，只配置最底级别，控制台输出的日志级别是大于或等于此级别的日志信息-->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>debug</level>
-        </filter>
     </appender>
 
-    <logger name="org.springframework" level="WARN"/>
+    <!--  正常日志文件压缩保存  -->
+    <appender name="INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
 
-    <!-- 生产环境下，将此级别配置为适合的级别，以免日志文件太多或影响程序性能 -->
+        <file>../logs/eds-scs-server.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>../logs/eds-scs-server-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder charset="UTF-8">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 日志输出级别 -->
     <root level="INFO">
-        <appender-ref ref="FILEERROR"/>
-        <appender-ref ref="FILEWARN"/>
-        <appender-ref ref="FILEINFO"/>
-        <!-- 生产环境可以去掉 -->
-        <appender-ref ref="STDOUT"/>
+        <!--控制台输出推荐只在本地调试时使用，线上将该配置去掉-->
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="INFO_LOG"/>
     </root>
+    
+    <!-- 自定义logger级别 -->
+    <logger name="com.dgyu.pure_design" level="INFO"/>
+    <logger name="com.dgyu.pure_design.mapper" level="DEBUG"/>
+    <logger name="tk.mybatis.mapper" level="INFO"/>
+    
+
 </configuration>

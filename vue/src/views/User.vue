@@ -95,6 +95,18 @@
         <el-form-item label="地址">
           <el-input v-model="form.address" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="头像:" prop="form.avatarUrl">
+          <el-upload class="avatar-uploader showUploader"
+                     ref="uploadFile"
+                     :auto-upload="false"
+                     :on-preview="handlePreview"
+                     :before-remove="beforeRemove"
+                     :on-change="uploadSectionFile"
+                     :limit="2" action="" accept=".jpg,.png,.jpeg">
+            <img v-if="form.avatarUrl" :src="form.avatarUrl" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -140,7 +152,9 @@ export default {
       courses: [],
       vis: false,
       stuCourses: [],
-      stuVis: false
+      stuVis: false,
+      files: {},
+      photo: '',
     }
   },
   created() {
@@ -191,6 +205,14 @@ export default {
       this.form = {}
     },
     handleEdit(row) {
+      const mainImg = this.$refs.uploadFile;
+      if (mainImg && mainImg.length) {
+        mainImg.forEach(item => {
+          // item.uploadFiles.length = 0;
+          item.clearFiles();
+        });
+      }
+      console.log(JSON.stringify(row))
       this.form = JSON.parse(JSON.stringify(row))
       this.dialogFormVisible = true
     },
@@ -242,7 +264,55 @@ export default {
     handleExcelImportSuccess() {
       this.$message.success("导入成功")
       this.load()
-    }
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    beforeRemove(file) {
+      return this.$confirm(`确定移除 ${ file.name }？`);
+    },
+    uploadSectionFile(file){
+      console.log('this.$refs.uploadFile:'+this.$refs.uploadFile.uploadFiles)
+      // 解决上传文件limit为1时，不触发onchange方法，在第二次调用的时候将第一个文件删除
+      if(this.$refs.uploadFile.uploadFiles.length>1){
+        this.$refs.uploadFile.uploadFiles.shift();
+      }
+      const typeArr = ['image/png', 'image/jpeg', 'image/jpg'];
+      const isJPG = typeArr.indexOf(file.raw.type) !== -1;
+      const isLt3M = file.size / 1024 / 1024 < 3;
+      if (!isJPG) {
+        this.$message.error('只能是图片png jpg jpeg!');
+        this.$refs.upload.uplo.clearFiles();
+        this.files = null;
+        return;
+      }
+      if (!isLt3M) {
+        this.$message.error('上传图片大小不能超过 3MB!');
+        this.photo=''
+        this.files = null;
+        return;
+      }
+      this.files = file.raw;
+      // FormData 对象
+      var formData = new FormData();
+      // 文件对象
+      formData.append('file', this.files);
+      let config = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        methods: 'post'
+      }
+      this.request.post("/file/common/upload",formData,config).then(res=>{
+        console.log('头像上传结果:'+res)
+        if(res){
+          this.photo = res
+          this.form.avatarUrl=res
+        }else{
+          this.$message.error('上传失败')
+        }
+      })
+    },
   }
 }
 </script>

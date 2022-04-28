@@ -62,6 +62,25 @@ public class FileController {
 	/*
 	 * @Autowired private StringRedisTemplate stringRedisTemplate;
 	 */
+	
+	/**
+	 * 通用文件上传接口
+	 * 
+	 * @param file 前端传递过来的文件
+	 * @return
+	 * @throws IOException
+	 */
+	@PostMapping("/common/upload")
+	public String commonUpload(@RequestParam MultipartFile file) throws IOException {
+		long size = file.getSize();
+		String fileExtName = StringUtils.substringAfterLast(file.getOriginalFilename(), ".");
+		String url = StringUtils.EMPTY;
+		StorePath storePath = storageClient.uploadFile(file.getInputStream(), size, fileExtName, null);
+		if (null != storePath) {
+			url = fdfsPath + storePath.getFullPath();
+		}
+		return url;
+	}
 
 	/**
 	 * 文件上传接口
