@@ -136,7 +136,7 @@ export default {
       const formData = new FormData();
       formData.append('file', $file);
       axios({
-        url: serverIp+'/file/upload',
+        url: serverIp+'/file/common/upload',
         method: 'post',
         data: formData,
         headers: {'Content-Type': 'multipart/form-data'},

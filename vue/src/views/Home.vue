@@ -9,7 +9,20 @@
       虎虎生威，虎年大吉
     </el-card>
     <div style="height: 1px; background: #ddd; margin: 20px 0"/>
-
+    <el-row>
+      <el-col :span="60">
+        <el-card>
+          <div slot="header" class="clearfix">
+            <span>打赏作者喝杯奶茶</span>
+          </div>
+          <div style="text-align: center">
+            <!--            <img src="https://img-blog.csdnimg.cn/9250639d4fc74eb385e5975f58bef0da.png" alt="">-->
+            <img src='../assets/zsm.jpg' />
+            <div class="pd-10">您可以请作者喝杯奶茶以资鼓励</div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
     <el-row :gutter="30">
       <el-col :span="12">
         <div style="padding: 20px 0; font-size: 20px">springboot+vue2专用框架</div>
@@ -47,20 +60,7 @@
       </el-col>
     </el-row>
 
-    <el-row>
-      <el-col :span="60">
-        <el-card>
-          <div slot="header" class="clearfix">
-            <span>打赏作者喝杯奶茶</span>
-          </div>
-          <div style="text-align: center">
-<!--            <img src="https://img-blog.csdnimg.cn/9250639d4fc74eb385e5975f58bef0da.png" alt="">-->
-            <img src='../assets/zsm.jpg' />
-            <div class="pd-10">您可以请作者喝杯奶茶以资鼓励</div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+
   </div>
 </template>
 
