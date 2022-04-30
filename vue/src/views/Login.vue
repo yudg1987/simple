@@ -5,11 +5,11 @@
       <div style="margin: 20px 0; text-align: center; font-size: 24px"><b>登 录</b></div>
       <el-form :model="user" :rules="rules" ref="userForm">
         <el-form-item prop="username">
-          <el-input size="medium" style="margin: 10px 0" prefix-icon="el-icon-user" v-model="user.username"></el-input>
+          <el-input size="medium" style="margin: 10px 0" prefix-icon="el-icon-user" v-model="user.username" placeholder="请输入账号"></el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input size="medium" style="margin: 10px 0" prefix-icon="el-icon-lock" show-password
-                    v-model="user.password"></el-input>
+                    v-model="user.password" placeholder="请输入密码"></el-input>
         </el-form-item>
         <el-form-item style="margin: 10px 0; text-align: center">
           <el-button type="warning" size="small" autocomplete="off" @click="$router.push('/register')">注册</el-button>

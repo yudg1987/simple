@@ -33,10 +33,13 @@
       <el-table-column prop="username" label="用户名" width="140"></el-table-column>
       <el-table-column prop="role" label="角色">
         <template slot-scope="scope">
+          <el-tag type="primary" >{{ scope.row.role }}</el-tag>
+        </template>
+<!--        <template slot-scope="scope">
           <el-tag type="primary" v-if="scope.row.role === 'ROLE_ADMIN'">管理员</el-tag>
           <el-tag type="warning" v-if="scope.row.role === 'ROLE_TEACHER'">老师</el-tag>
           <el-tag type="success" v-if="scope.row.role === 'ROLE_STUDENT'">学生</el-tag>
-        </template>
+        </template>-->
       </el-table-column>
       <el-table-column prop="nickname" label="昵称" width="120"></el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
