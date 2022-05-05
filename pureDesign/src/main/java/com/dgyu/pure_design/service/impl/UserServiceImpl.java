@@ -79,7 +79,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 			one = new User();
 			BeanUtil.copyProperties(userDTO, one, true);
 			// 默认一个普通用户的角色
-			one.setRole(RoleEnum.ROLE_USER.toString());
+			one.setRole(RoleEnum.ROLE_STUDENT.toString());
 			save(one); // 把 copy完之后的用户对象存储到数据库
 		} else {
 			throw new BusinessException(Constants.CODE_600, "用户已存在");
@@ -98,9 +98,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 	@Override
 	public Page<User> findPage(Page<User> page, String username, String email, String address) {
 		Page<User> pageUser= userMapper.findPage(page, username, email, address);
-		pageUser.getRecords().forEach(user->{
-			user.setRole(RoleEnum.getName(user.getRole()));
-		});
+		/*
+		 * pageUser.getRecords().forEach(user->{
+		 * user.setRole(RoleEnum.getName(user.getRole())); });
+		 */
 		return pageUser;
 	}
 
