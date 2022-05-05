@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public enum RoleEnum {
 
-	ROLE_SUPER_ADMIN("超级管理员"), ROLE_ADMIN("普通管理员"), ROLE_USER("普通用户"), ROLE_STUDENT("学生"),ROLE_TEACHER("教师");
+	ROLE_SUPER_ADMIN("超级管理员"), ROLE_ADMIN("管理员"), ROLE_STUDENT("学生"),ROLE_TEACHER("教师");
 
 	RoleEnum(String desc) {
 		this.desc = desc;
