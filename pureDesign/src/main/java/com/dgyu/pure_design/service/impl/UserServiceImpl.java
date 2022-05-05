@@ -2,6 +2,8 @@ package com.dgyu.pure_design.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.log.Log;
+import lombok.extern.slf4j.Slf4j;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -34,6 +36,7 @@ import java.util.List;
  * @since 2022-01-26
  */
 @Service
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
 	private static final Log LOG = Log.get();
@@ -94,7 +97,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 	@Override
 	public Page<User> findPage(Page<User> page, String username, String email, String address) {
-		return userMapper.findPage(page, username, email, address);
+		Page<User> pageUser= userMapper.findPage(page, username, email, address);
+		pageUser.getRecords().forEach(user->{
+			user.setRole(RoleEnum.getName(user.getRole()));
+		});
+		return pageUser;
 	}
 
 	private User getUserInfo(UserDTO userDTO) {
