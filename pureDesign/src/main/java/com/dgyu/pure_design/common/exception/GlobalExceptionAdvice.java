@@ -23,7 +23,7 @@ public class GlobalExceptionAdvice
 	@ExceptionHandler(value = MethodArgumentNotValidException.class)
 	public ResponseDTO handleVaildException(HttpServletRequest req, MethodArgumentNotValidException ex)
 	{
-		log.error("【BusinessException】:\t请求路径：{},\t错误信息：{}", req.getRequestURL(), ex);
+		log.error("1【BusinessException】:\t请求路径：{},\t错误信息：{}", req.getRequestURL(), ex);
 		BindingResult bindingResult = ex.getBindingResult();
 		Map<String, String> errorMap = new HashMap<>();
 		bindingResult.getFieldErrors().forEach((fieldError) -> {
@@ -39,7 +39,7 @@ public class GlobalExceptionAdvice
 	@ExceptionHandler(value = BusinessException.class)
 	public ResponseDTO handlerBusinessException(HttpServletRequest req, BusinessException ex)
 	{
-		log.error("【BusinessException】:\t请求路径：{},\t错误信息：{}", req.getRequestURL(), ex);
+		log.error("2【BusinessException】:\t请求路径：{},\t错误信息：{}", req.getRequestURL(), ex);
 		return ResponseDTO.failed(ex.getMessage());
 	}
 
@@ -55,7 +55,7 @@ public class GlobalExceptionAdvice
 			boolean sentinel = ex.getCause().toString().contains("sentinel");
 			if (sentinel)
 			{
-				log.error("【服务器繁忙请稍后再试】:\t请求路径：{}", req.getRequestURL());
+				log.error("3【服务器繁忙请稍后再试】:\t请求路径：{}", req.getRequestURL());
 				return ResponseDTO.failed("服务器繁忙请稍后再试");
 			}
 		}
